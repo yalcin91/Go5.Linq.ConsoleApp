@@ -11,9 +11,14 @@ namespace Go5.Linq.ConsoleApp
             ReadingTxtFile readingTxtFile = new ReadingTxtFile();
             readingTxtFile.StreamRead();
 
-            //readingTxtFile.SorteerProvincienaamABC();
-            //readingTxtFile.LijstStraatNamenVoorGemeente("Antwerpen");
-            readingTxtFile.MeestVoorkomendStraatNaam();
+            //readingTxtFile.SorteerProvincienaamABC();                                              // 1
+            //readingTxtFile.LijstStraatNamenVoorGemeente("Antwerpen");                              // 2
+            readingTxtFile.MeestVoorkomendStraatNaam();                                            // 3
+            //readingTxtFile.GemeenschappelijkeStratenVanTweeGemeenten("Aartselaar", "Antwerpen");   // 5
+            //readingTxtFile.StraatNamenVanOpgegevenGemeenteEnkel("Antwerpen");                      // 6
+            //readingTxtFile.GemeenteHoogsteAantalStraatnamen();                                     // 7
+            //readingTxtFile.LangsteStraatnaam();                                                    // 8
+            //readingTxtFile.LangsteStraatMetGMenPR();                                               // 9
         }
     }
 }

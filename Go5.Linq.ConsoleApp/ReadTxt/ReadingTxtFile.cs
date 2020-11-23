@@ -39,8 +39,11 @@ namespace Go5.Linq.ConsoleApp.ReadTxt
                     Id++;
                     count = 0;
                 }
-            }         
+            }
         }
+        //***************************************************************************************************
+        //***************************************************************************************************
+        //***************************************************************************************************
 
         #region 1) Geef lijst met de provincienamen, alfabetisch gesorteerd.
         /// <summary>
@@ -50,9 +53,9 @@ namespace Go5.Linq.ConsoleApp.ReadTxt
         public IEnumerable<string> SorteerProvincienaamABC()
         {
             var v = _Adres.Values.OrderBy(x => x.Provincie).Select(x => x.Provincie).Distinct();
-            foreach(var a in v)
+            foreach (var a in v)
             {
-                Console.WriteLine(a);
+                //Console.WriteLine(a);
             }
             return v;
         }
@@ -66,35 +69,116 @@ namespace Go5.Linq.ConsoleApp.ReadTxt
         /// <returns>Straten</returns>
         public IEnumerable<string> LijstStraatNamenVoorGemeente(string gemeente)
         {
-            var v = _Adres.Values.Where(x => x.Gemeente == gemeente).Select(x=> x.Provincie);
-            foreach(var a in v)
+            var v = _Adres.Values.Where(x => x.Gemeente == gemeente).Select(x => x.Straat);
+            foreach (var a in v)
             {
-                Console.WriteLine(a);
+                //Console.WriteLine(a);
             }
+            Console.WriteLine(count);
             return v;
         }
         #endregion
 
-        #region 3) Selecteer de straatnaam die het meest keren voorkomt en druk voor elk voorkomen de pr, gm, stn. Sortering op basis van provincie en gemeente.
-        public IEnumerable<string> MeestVoorkomendStraatNaam()
+        #region 3) Selecteer de straatnaam die het meest keren voorkomt en druk voor elk voorkomen de pr, gm, strn. + sorteer.
+        /// <summary>
+        /// Geeft de lijst van meest voorkomend straat met pr, gm, strn
+        /// en sorteer op basis van provincie en gemeente
+        /// </summary>
+        /// <returns></returns>
+        public List<Data> MeestVoorkomendStraatNaam()
         {
-            var straatNaam = _Adres.Values.ToLookup(x=> x.Straat);
-            var straatNaamMax = straatNaam.Max(x=> x.Count());
-            var straatNaamMaxWaar = straatNaam.Where(x=> x.Count() == straatNaamMax).Select(x => x.Key).ToList();
-            var adressen = _Adres.Values.Where(x => x.Straat == straatNaamMaxWaar.ToString()).Select(x => x.Provincie).ToList();
-            foreach (var a in straatNaamMaxWaar)
+            var adres = _Adres.Values.GroupBy(x => x.Straat).OrderByDescending(x=> x.Count()).First().
+                OrderBy(x=> x.Provincie).ThenBy(x=> x.Gemeente).ToList();
+            foreach (var a in adres)
             {
-                adressen = _Adres.Values.Where(x => x.Straat == a).Select(x =>  x.Provincie + " " + x.Gemeente +
-                                                                          " " + x.Straat ).ToList();
+                Console.WriteLine(a.Provincie + " " + a.Gemeente + " " + a.Straat);
             }
-            foreach(var a in adressen)
-            {
-                Console.WriteLine(a);
-            }
-
-             return adressen;
+            return adres;
         }
         #endregion
 
+        #region 5) functie die voor 2 opgegeven gemeenten de gemeenschappelijke lijst van straatnamen
+        /// <summary>
+        /// Geeft de gemeenschappelijke straten terug
+        /// </summary>
+        /// <param name="gemeente1">Vul de eertse gemeente in</param>
+        /// <param name="gemeente2">Vul de tweede gemeente in</param>
+        /// <returns></returns>
+        public IEnumerable<string> GemeenschappelijkeStratenVanTweeGemeenten(string gemeente1, string gemeente2)
+        {
+            var gem1 = _Adres.Values.Where(x => x.Gemeente == gemeente1).Select(x => x.Straat).ToList();
+            var gem2 = _Adres.Values.Where(x => x.Gemeente == gemeente2).Select(x => x.Straat).ToList();
+            var gelijk = gem1.Intersect(gem2);
+            foreach (var a in gelijk)
+            {
+                Console.WriteLine(a);
+            }
+            return gelijk;
+        }
+        #endregion
+
+        #region 6)  functie die de straatnamen weergeeft die enkel voorkomen in de opgegeven gemeente, maar niet in andere.
+        /// <summary>
+        /// Straatnamen die enkel voorkomen in geselecteerde gemeente
+        /// maar die niet voorkomen in een lijst van andere gemeenten.
+        /// </summary>
+        /// <param name="gemeente">Vul de gewenste gemeente in</param>
+        /// <returns></returns>
+        public IEnumerable<string> StraatNamenVanOpgegevenGemeenteEnkel(string gemeente)
+        {
+            var nietGelijk = _Adres.Values.ToLookup(x => x.Straat).Where(x => x.Count() == 1).Select(x => x.First()).
+                Where(x => x.Gemeente == gemeente).Select(x => x.Straat).ToList();
+            foreach (var a in nietGelijk)
+            {
+                Console.WriteLine(a);
+            }
+            return nietGelijk;
+        }
+        #endregion
+
+        #region 7) Maak een functie die de gemeente weergeeft met het hoogste aantal straatnamen.
+        /// <summary>
+        /// Dit is een functie die de gemeente weergeeft met het hoogste aantal straatnamen.
+        /// </summary>
+        /// <returns></returns>
+        public string GemeenteHoogsteAantalStraatnamen()
+        {
+            var gemeente = _Adres.Values.GroupBy(x => x.Gemeente).Select(x => new { x.Key, n = x.Count() }).
+                OrderByDescending(x => x.n).First();
+
+            Console.WriteLine(gemeente);
+            return gemeente.Key;
+        }
+        #endregion
+
+        #region 8) Geef de langste straatnaam weer
+        /// <summary>
+        /// Dit geeft de langste straatnaam weer
+        /// </summary>
+        /// <returns></returns>
+        public string LangsteStraatnaam()
+        {
+            var straat = _Adres.Values.Max(x => x.Straat.Count());
+            var naam = _Adres.Values.Select(x => x.Straat).Where(x => x.Count() == straat);
+            Console.WriteLine(naam.First());
+            return straat.ToString();
+        }
+        #endregion
+
+        #region 9)  Geeft de naast de langste straatnaam ook de gemeente en provincie weer.
+        /// <summary>
+        /// Geeft de langste straatnaam met de gemeente en provincie weer.
+        /// </summary>
+        /// <returns></returns>
+        public string LangsteStraatMetGMenPR()
+        {
+            var straat = _Adres.Values.Max(x => x.Straat.Count());
+            var naamStraat = _Adres.Values.Select(x => x.Straat).Where(x => x.Count() == straat).First();
+            var adres = _Adres.Values.Where(x => x.Straat == naamStraat).
+                Select(x => x.Provincie + " " + x.Gemeente + " " + x.Straat).First();
+            Console.WriteLine(adres);
+            return adres;
+        }
+        #endregion
     }
 }
