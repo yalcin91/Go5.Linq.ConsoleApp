@@ -180,5 +180,38 @@ namespace Go5.Linq.ConsoleApp.ReadTxt
             return adres;
         }
         #endregion
+
+        #region 10) Geef een lijst met straatnamen die uniek zijn (en toon ook gemeente en provincie).
+        /// <summary>
+        /// Dit Geef een lijst met straatnamen die uniek zijn en toont ook de gemeente en de provincie).
+        /// </summary>
+        /// <returns></returns>
+        public List<Data> UniekStraatnamen()
+        {
+            var adres = _Adres.Values.GroupBy(x => x.Straat).Where(x => x.Count() == 1).Select(x=> x.First()).ToList();
+            foreach(var a in adres)
+            {
+                Console.WriteLine(a.Provincie + " " + a.Gemeente + " " + a.Straat);
+            }
+            return adres;
+        }
+        #endregion
+
+        #region 11) Geef een lijst met straatnamen die uniek zijn voor een opgegeven gemeente.
+        /// <summary>
+        /// Dit Geef een lijst met straatnamen die uniek zijn  voor een opgegeven gemeente en toont ook de gemeente en de provincie).
+        /// </summary>
+        /// <returns></returns>
+        public List<Data> UniekStraatnamenOpgegevenGemeente(string gemeente)
+        {
+            var adres = _Adres.Values.GroupBy(x => x.Straat).Where(x => x.Count() == 1).Select(x => x.First()).
+                Where(x=> x.Gemeente == gemeente).ToList();
+            foreach (var a in adres)
+            {
+                Console.WriteLine(a.Provincie + " " + a.Gemeente + " " + a.Straat);
+            }
+            return adres;
+        }
+        #endregion
     }
 }
